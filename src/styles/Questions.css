@@ -1,0 +1,179 @@
+.exam-container {
+    font-family: Arial, sans-serif;
+  }
+  
+  .exam-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #222;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .exam-timer {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .submit-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .submit-btn:disabled {
+    background: gray;
+    cursor: not-allowed;
+  }
+  
+  .questions-content {
+    padding: 150px 10px;
+    text-align: center;
+    
+  }
+  
+  .exam-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #222;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .exam-footer .left {
+    width: 15px;
+    margin-right: 5px;
+   
+ 
+    
+    
+  }
+  
+  .right {
+    text-align: right;
+    padding-right: 30px;
+  }
+  
+  .small-text {
+    font-size: 10px;
+  }
+  
+
+ 
+  .exam-footer img {
+  width: 40px;
+}
+
+.modal {
+  position: fixed;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  box-shadow: 0 8px 16px rgba(254, 26, 0.2);
+  border-radius: 10px;
+  width: 500%;
+  max-width: 1000px;
+  text-align: center;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction:column;
+  align-items: center;
+  color: #110101;
+}
+
+.modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 10px 15px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background: #007bff;
+  color: rgb(240, 236, 236);
+}
+
+.modal-buttons button:disabled {
+  background: #110101;
+  cursor: not-allowed;
+}
+.question-image {
+  width: 300%;
+  max-height: 400px;
+  object-fit: contain;
+  margin-bottom: 15px;
+}
+
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  
+  
+}
+
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.radio-option input {
+  /* Ensures spacing between radio and text */
+  flex-shrink: 0; /* Prevents the radio button from resizing */
+  transform: scale(1.5);
+}
+
+.radio-option label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.radio-option span {
+  min-width: 150px;  /* Adjust width as needed */
+   /* Ensures text starts from the same point */
+}
+
+
+
+.modal-buttons button {
+  font-size: 16px;
+  padding: 12px;
+  width: 100px;
+}
+.question-text {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}

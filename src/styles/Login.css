@@ -1,0 +1,234 @@
+/* Full-page styling */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color:none;
+    color: white;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Outer red border with text */
+.border-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: -1;
+}
+
+/* Watermark text */
+.border-text {
+    position: fixed;
+    font-size: 10rem;  /* Big watermark text */
+    font-weight: bold;
+    color: rgba(234, 225, 225, 0.3);
+    text-transform: uppercase;
+    transform: rotate(-30deg);
+    opacity: 10;
+    width: 150%;
+    text-align: center;
+}
+.border-text2 {
+    position: fixed;
+    font-size: 5rem;  /* Big watermark text */
+    font-weight: bold;
+    color: rgba(234, 225, 225, 0.3);
+    text-transform: uppercase;
+    transform: rotate(30deg);
+    opacity: 10;
+    width:70%;
+    text-align: left;
+}
+.border-text3 {
+    position: fixed;
+    font-size: 5rem;  /* Big watermark text */
+    font-weight: bold;
+    color: rgba(234, 225, 225, 0.3);
+    text-transform: uppercase;
+    transform: rotate(30deg);
+    opacity: 10;
+    width:90%;
+    text-align:right;
+}
+
+
+/* Main container */
+.login-container {
+    display: flex;
+    width: 85%;
+    padding-left: 20%;
+    max-width: 1300px;
+    height: 90vh;
+    justify-content: space-between;
+    align-items: center;
+    gap: 29%;
+}
+
+/* Left Side: Image */
+.image-container {
+    flex: 1;
+   
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200%;
+}
+
+.image-container img {
+    max-width: 250%;
+    max-height: 250%;
+    border-radius: 10px;
+    box-shadow: 0px 8px 20px rgba(255, 0, 0, 0.8);
+}
+
+/* Right Side: Login Card */
+.login-card {
+    flex: 1;
+    max-width: 500px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1); /* Glass effect */
+    backdrop-filter: blur(15px);
+    border-radius: 15px;
+    box-shadow: 0px 8px 20px rgba(255, 0, 0, 0.8);
+    text-align: center;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+
+/* Login Inputs */
+input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #ff0000;
+    border-radius: 8px;
+    font-size: 16px;
+    background: black;
+    color: white;
+}
+
+button {
+    width: 95%;
+    padding: 14px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: darkred;
+    transform: scale(1.05);
+}
+
+/* Error message styling */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 1024px) {
+    .border-text {
+        font-size: 5rem;
+    }
+
+    .login-container {
+        flex-direction: column;
+        height: auto;
+        gap: 30px;
+    }
+
+    .image-container img {
+        width: 80%;
+    }
+
+    .login-card {
+        width: 80%;
+        height: auto;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .border-text {
+        font-size: 3rem;
+    }
+
+    .image-container img {
+        width: 100%;
+    }
+
+    .login-card {
+        width: 90%;
+    }
+}
+/* Background Video */
+.bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -2;
+}
+/* Ensure the image and login card are stacked on smaller screens */
+@media screen and (max-width: 768px) {
+    .login-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+  
+    .image-container {
+      width: 80%;
+      text-align: center
+    }
+  
+    .login-card {
+      width: 80%;
+      text-align: center
+    }
+  
+    .border-text {
+      font-size: 5rem; /* Reduce size on smaller screens */
+    }
+  }
+  
+  /* Adjust for very small screens */
+  @media screen and (max-width: 480px) {
+    .border-text {
+      font-size: 3rem;
+    }
+  
+    .image-container {
+      width: 100%;
+      text-align: center
+    }
+  
+    .login-card {
+      width: 90%;
+      text-align: center
+    }
+  }
+  
