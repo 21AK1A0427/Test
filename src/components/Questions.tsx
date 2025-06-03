@@ -3,17 +3,50 @@ import { useNavigate } from "react-router-dom";
 import "../styles/Questions.css";
 import axios from "axios";
 
+interface Question {
+  id: number;
+  questionText: string;
+  options?: string[];
+  correctAnswer: string;
+  imageUrl?: string;
+  type: "mcq" | "fill";
+}
+
+interface UserResult {
+  questionId: number;
+  questionText: string;
+  userAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+}
+
 const Questions: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | null>(null);
   const [rollNumber, setRollNumber] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState(30 * 60);
-  const [tabSwitchCount, setTabSwitchCount] = useState(0);
+
+  const [tabSwitchCount, setTabSwitchCount] = useState(() => {
+    const savedCount = sessionStorage.getItem("tabSwitchCount");
+    return savedCount ? parseInt(savedCount) : 0;
+  });
+
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const savedTime = sessionStorage.getItem("examTimeLeft");
+    return savedTime ? parseInt(savedTime) : 50 * 60;
+  });
+  
   const [isAutoSubmitted, setIsAutoSubmitted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
+  const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>(() => {
+    const savedAnswers = sessionStorage.getItem("examAnswers");
+    return savedAnswers ? JSON.parse(savedAnswers) : {};
+  });
 
-  const questions = [
+  
+
+  const [enableEndExam, setEnableEndExam] = useState(false);
+
+  const questions: Question[] = [
     { id: 1, questionText: "1. Which of the following correctly shows the hierarchy of arithmetic operations in C?", options: ["\u00A0\u00A0\u00A0\u00A0/+*-", "\u00A0\u00A0\u00A0\u00A0*-/+", "\u00A0\u00A0\u00A0\u00A0+-/*", "\u00A0\u00A0\u00A0\u00A0/*+-" ], correctAnswer: "/*+-", type: "mcq" },
     { id: 2, questionText: "Q.No - 2", options: ["Infinite_Times","32767_Times","65535_Times","Till_stack_overflows"], correctAnswer: "Till_stack_overflows", imageUrl: "https://i.imgur.com/PAHKUk3.png", type: "mcq" },
     { id: 3, questionText: "3. In which header file is the NULL macro defined?", options: ["stdio.h", "stddef.h", "stdio.h_and_stddef.h", "math.h"], correctAnswer: "stdio.h_and_stddef.h", type: "mcq" },
@@ -24,7 +57,7 @@ const Questions: React.FC = () => {
     { id: 8, questionText: "8. Which bitwise operator is suitable for turning off a particular bit in a number?", options: ["&&\u00A0operator", "&\u00A0operator", "||operator", "!\u00A0operator"], correctAnswer: "&\u00A0operator", type: "mcq" },
     { id: 9, questionText: "Q.No - 9", options: ["5", "10", "Error", "Garbage\u00A0alue"], correctAnswer: "Error", imageUrl: "https://i.imgur.com/NebnW6Y.png", type: "mcq" },
     { id: 10, questionText: "Q.No - 10", options: ["Garbage\u00A0value", "Error", "0", "20"], correctAnswer: "20", imageUrl: "https://i.imgur.com/fjbOiri.png", type: "mcq" },
-    { id: 11, questionText: "Q.No - 11", options: ["Error\u00A0:++\u00A0needs_a_value", "10", "11", "No\u00A0Output"], correctAnswer: "No Output", imageUrl: "https://i.imgur.com/fjbOiri.png", type: "mcq" },
+    { id: 11, questionText: "Q.No - 11", options: ["Error\u00A0:++\u00A0needs_a_value", "10", "11", "No\u00A0Output"], correctAnswer: "No Output", imageUrl: "https://i.imgur.com/mZndTFr.png", type: "mcq" },
     { id: 12, questionText: "12. Which standard library function will you use to find the last occurance of a character in a string in C?", options: ["strnchar()", "strchar()","strrchar()", "strrchr()" ], correctAnswer: "strrchr()", type: "mcq" },
     { id: 13, questionText: "13. What is stderr ?", correctAnswer: "standard error streams", type: "fill" },
     { id: 14, questionText: "14. Does there any function exist to convert the int or float to a string?", options: ["Yes", "No" ], correctAnswer: "Yes", type: "mcq" },
@@ -35,7 +68,7 @@ const Questions: React.FC = () => {
     { id: 19, questionText: "19. Which of the following cannot be checked in a switch-case statement?", options: ["Character", "Integer","Float","Enum" ], correctAnswer:"Float", type: "mcq" },
     { id: 20, questionText: "20. What are the different types of real data type in C ?", correctAnswer: "float double longdouble", type: "fill" },
     { id: 21, questionText: "21. The binary equivalent of 5.375 is", correctAnswer: "101.011", type: "fill" },
-    { id: 22, questionText: "22. Which Header is main in C program to work correctly?", correctAnswer: "# include<math.h>", type: "fill" },
+    { id: 22, questionText: "22. Which Header is main in C program to work correctly?", correctAnswer: "#include<math.h>", type: "fill" },
     { id: 23, questionText: "23. Who invented C ?", correctAnswer: "dennis ritchie", type: "fill" },
     { id: 24, questionText: "24. Size of float in C Float=__________?", correctAnswer: "4", type: "fill" },
     { id: 25, questionText: "25. in which stage the following code #include<stdio.h> gets replaced by the contents of the file stdio.h ?", correctAnswer: "preprocessing", type: "fill" },
@@ -64,17 +97,23 @@ const Questions: React.FC = () => {
     { id: 48, questionText: "", options: ["\u00A0\u00A0\u00A0\u00A0A", "\u00A0\u00A0\u00A0\u00A0B", "\u00A0\u00A0\u00A0\u00A0C", "\u00A0\u00A0\u00A0\u00A0D"], correctAnswer: "A", imageUrl: "https://i.imgur.com/GJnWXC0.png", type: "mcq" },
     { id: 49, questionText: "", options: ["\u00A0\u00A0\u00A0\u00A0A", "\u00A0\u00A0\u00A0\u00A0B", "\u00A0\u00A0\u00A0\u00A0C", "\u00A0\u00A0\u00A0\u00A0D"], correctAnswer: "C", imageUrl: "https://i.imgur.com/rtbL7Dk.png", type: "mcq" },
     { id: 50, questionText: "", options: ["\u00A0\u00A0\u00A0\u00A0A", "\u00A0\u00A0\u00A0\u00A0B", "\u00A0\u00A0\u00A0\u00A0C", "\u00A0\u00A0\u00A0\u00A0D"], correctAnswer: "A", imageUrl: "https://i.imgur.com/tTY7r6v.png", type: "mcq" },
-    
-    
-
-
-    
-    
-    /*https://i.imgur.com/Q5cHF5I.png
-
-
-*/
   ];
+  useEffect(() => {
+    sessionStorage.setItem("tabSwitchCount", tabSwitchCount.toString());
+  }, [tabSwitchCount]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!isAutoSubmitted) {
+        e.preventDefault();
+        e.returnValue = "Are you sure you want to leave? Your progress may be lost.";
+        return "Are you sure you want to leave? Your progress may be lost.";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isAutoSubmitted]);
 
   useEffect(() => {
     const storedEmail = sessionStorage.getItem("email");
@@ -84,25 +123,47 @@ const Questions: React.FC = () => {
       setEmail(storedEmail);
       setRollNumber(storedRollNumber);
     }
+     const savedTime = sessionStorage.getItem("examTimeLeft");
+    if (savedTime && parseInt(savedTime) <= (50 * 60 - 15 * 60)) {
+      setEnableEndExam(true);
+    }
 
     const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1 && !isAutoSubmitted) {
-          handleAutoSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+        setTimeLeft((prev) => {
+          const newTime = prev - 1;
+          
+          // Enable End Exam button after 30 minutes (1800 seconds)
+          if (timeLeft <= (50 * 60 - 15 * 60) && !enableEndExam) {
+            setEnableEndExam(true);
+          }
+  
+          if (newTime <= 1 && !isAutoSubmitted) {
+            handleAutoSubmit();
+            return 0;
+          }
+          return newTime;
+        });
+      }, 1000);
+  
+      
+      return () => clearInterval(timer);
+    }, [navigate, isAutoSubmitted]);
 
-    return () => clearInterval(timer);
-  }, [navigate, isAutoSubmitted]);
+    useEffect(() => {
+        sessionStorage.setItem("examTimeLeft", timeLeft.toString());
+      }, [timeLeft]);
+    
+      useEffect(() => {
+        sessionStorage.setItem("examAnswers", JSON.stringify(userAnswers));
+      }, [userAnswers]);
+    
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         setTabSwitchCount((prev) => {
           const newCount = prev + 1;
+          sessionStorage.setItem("tabSwitchCount", newCount.toString());
           alert(`You switched the tab! Tab switch count: ${newCount}/3`);
           if (newCount >= 3 && !isAutoSubmitted) {
             alert("You switched tabs 3 times. Auto-submitting exam.");
@@ -125,7 +186,12 @@ const Questions: React.FC = () => {
     setUserAnswers((prev) => ({ ...prev, [questionId]: text }));
   };
 
+  
+
   const handleSubmit = async () => {
+   
+    await calculateAndSubmitResults(userAnswers);
+   
     calculateAndSubmitResults(userAnswers);
   };
 
@@ -138,27 +204,31 @@ const Questions: React.FC = () => {
       console.log("User Answers (Before Auto-Submit):", userAnswers);
   
       setUserAnswers((prevAnswers) => {
+        
+        
         console.log("Final Answers Captured for Auto-Submit:", prevAnswers);
         calculateAndSubmitResults(prevAnswers);
         return prevAnswers;
       });
-    }, 500); // Small delay to capture final state
+    }, 500);
   };
   
 
   const calculateAndSubmitResults = async (answers: { [key: number]: string }) => {
-    let totalScore = 0, correctAnswers = 0, wrongAnswers = 0;
-    const userResults = [];
+    let totalScore = 0;
+    let correctAnswers = 0;
+    let wrongAnswers = 0;
+    const userResults: UserResult[] = [];
 
     questions.forEach((q) => {
-      const userAnswer = answers[q.id]?.trim().toLowerCase() || "";
-      const correctAnswer = q.correctAnswer.toLowerCase();
+      const userAnswer = (answers[q.id] || "").toString().trim().toLowerCase();
+      const correctAnswer = q.correctAnswer.toString().trim().toLowerCase();
       const isCorrect = userAnswer === correctAnswer;
 
       if (isCorrect) {
-        totalScore += 2;
+        totalScore += 2; // Each correct answer gives 1 point
         correctAnswers++;
-      } else {
+      } else if (answers[q.id] !== undefined) {
         wrongAnswers++;
       }
 
@@ -171,7 +241,8 @@ const Questions: React.FC = () => {
       });
     });
 
-    const percentage = (totalScore / (questions.length * 2)) * 100;
+    // Calculate percentage based on total questions (each question worth 1 point)
+    const percentage = (totalScore / questions.length) * 100;
 
     const storedEmail = sessionStorage.getItem("email") || email;
     const storedRollNumber = sessionStorage.getItem("rollNumber") || rollNumber;
@@ -188,12 +259,13 @@ const Questions: React.FC = () => {
         totalScore,
         correctAnswers,
         wrongAnswers,
+        unanswered: questions.length - (correctAnswers + wrongAnswers),
         percentage: percentage.toFixed(2),
         userResults,
         submissionTime: new Date().toISOString()
       });
-      alert("Submission successful!");
-      navigate("/");
+      alert(`Submission successful!`);
+      navigate("/Home");
     } catch (error) {
       console.error("Submission failed:", error);
       alert("Failed to submit data.");
@@ -212,9 +284,24 @@ const Questions: React.FC = () => {
         </div>
         <div className="user-info">
           {email} ({rollNumber})
-          <button className="submit-btn" onClick={handleSubmit}>End Exam</button>
+          <button className="submit-btn" onClick={handleSubmit}  disabled={!enableEndExam && timeLeft > 0}>End Exam</button>
         </div>
       </nav>
+      <footer className="exam-footer">
+        <div className="left">
+       <img src="https://i.imgur.com/oGtwSmY.png" alt="Logo" />
+        <span>AITT TIRUPATI</span>  
+        </div>
+        <div className="center">
+          © All Rights Reserved 2025 
+        </div>
+        <div className="right">
+          Crafted by - <strong>GURU GANGADHAR REDDY</strong>
+          <div className="small-text">21AK1A0427</div>
+          <div className="small-text">IV - ECE</div>
+        </div>
+      </footer>
+
 
       <div className="modal">
         <div className="modal-content">
@@ -222,17 +309,29 @@ const Questions: React.FC = () => {
           {questions[currentIndex].imageUrl && (
             <img src={questions[currentIndex].imageUrl} alt="Question" className="question-image" />
           )}
-          {questions[currentIndex].type === "mcq" ? (
+          {questions[currentIndex].type === "mcq" && questions[currentIndex].options ? (
             <div className="options">
               {questions[currentIndex].options.map((option, index) => (
                 <label key={index} className="radio-option">
-                  <input type="radio" name={`q${currentIndex}`} value={option} checked={userAnswers[questions[currentIndex].id] === option} onChange={() => handleOptionChange(questions[currentIndex].id, option)} />
+                  <input 
+                    type="radio" 
+                    name={`q${currentIndex}`} 
+                    value={option} 
+                    checked={userAnswers[questions[currentIndex].id] === option} 
+                    onChange={() => handleOptionChange(questions[currentIndex].id, option)} 
+                  />
                   {option}
                 </label>
               ))}
             </div>
           ) : (
-            <input type="text" placeholder="Type your answer here" value={userAnswers[questions[currentIndex].id] || ""} onChange={(e) => handleTextChange(questions[currentIndex].id, e.target.value)} className="fill-input" />
+            <input 
+              type="text" 
+              placeholder="Type your answer here" 
+              value={userAnswers[questions[currentIndex].id] || ""} 
+              onChange={(e) => handleTextChange(questions[currentIndex].id, e.target.value)} 
+              className="fill-input" 
+            />
           )}
           <div className="modal-buttons">
             <button onClick={() => setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev))} disabled={currentIndex === 0}>Previous</button>
@@ -241,9 +340,14 @@ const Questions: React.FC = () => {
               <button className="submit-btn" onClick={handleSubmit}>Submit</button>
             )}
           </div>
+
+          
         </div>
       </div>
+      
     </div>
+    
+    
   );
 };
 

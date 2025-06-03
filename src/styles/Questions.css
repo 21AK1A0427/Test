@@ -55,7 +55,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 5px;
   }
   
   .exam-footer .left {
@@ -76,10 +76,8 @@
     font-size: 10px;
   }
   
-
- 
   .exam-footer img {
-  width: 40px;
+  width: 0px;
 }
 
 .modal {

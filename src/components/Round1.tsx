@@ -53,8 +53,8 @@ const Navbar = () => {
 const Round1: React.FC = () => {
   const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState<boolean>(false);
-  const [imageIndex, setImageIndex] = useState<number>(0);
-  const [fadeIn, setFadeIn] = useState<boolean>(false);
+  const [, setImageIndex] = useState<number>(0);
+  const [, setFadeIn] = useState<boolean>(false);
 
   const handleNextClick = () => {
     setFadeIn(false); // Remove image temporarily
@@ -85,7 +85,7 @@ const Round1: React.FC = () => {
               {/* Image on the Card */}
               <img
                 className="round1-image"
-                src="https://i.imgur.com/NeX1rHa.png"
+                src="https://i.imgur.com/IQv8V4V.png"
                 alt="Final Card Image"
               />
 
@@ -98,7 +98,7 @@ const Round1: React.FC = () => {
             <>
               <img
                 className="round1-image"
-                src="https://i.imgur.com/Ckqd4vN.jpeg"
+                src="https://i.imgur.com/haEp60y.jpeg"
                 alt="Final Card Image"
               />
               <button className="btn start-btn" onClick={() => navigate("/Validation")}>

@@ -1,10 +1,24 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Exam.css";
 
 const API_URL = "https://id-backend-1.onrender.com/exam";
+
+type StudentData = {
+  firstIds?: string[];
+  secondIds?: string[];
+  thirdIds?: string[];
+  fourthIds?: string[];
+};
+
+type RoundStatus = {
+  round1: boolean;
+  round2: boolean;
+  round3: boolean;
+  round4: boolean;
+};
 
 const generateFallingElements = () => {
   return Array.from({ length: 100 }, (_, i) => {
@@ -23,12 +37,17 @@ const generateFallingElements = () => {
 
 const Exam = () => {
   const navigate = useNavigate();
-  const [isRoundActive, setIsRoundActive] = useState({});
+  const [isRoundActive, setIsRoundActive] = useState<RoundStatus>({
+    round1: false,
+    round2: false,
+    round3: false,
+    round4: false,
+  });
   const [showPopup, setShowPopup] = useState(false);
   const [idInput, setIdInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [currentRound, setCurrentRound] = useState(null);
-  const [studentData, setStudentData] = useState({});
+  const [currentRound, setCurrentRound] = useState<string | null>(null);
+  const [studentData, setStudentData] = useState<StudentData>({});
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -50,17 +69,17 @@ const Exam = () => {
     const interval = setInterval(() => {
       const now = new Date();
       setIsRoundActive({
-        round1: now >= new Date("2025-03-28T10:30:00") && now <= new Date("2025-04-08T12:40:00"),
-        round2: now >= new Date("2025-03-28T10:30:00") && now <= new Date("2025-04-09T13:00:00"),
-        round3: now >= new Date("2025-03-28T10:30:00") && now <= new Date("2025-04-10T12:40:00"),
-        round4: now >= new Date("2025-03-28T10:30:00") && now <= new Date("2025-04-11T13:00:00"),
+        round1: now >= new Date("2025-04-09T09:30:00") && now <= new Date("2030-04-10T12:40:00"),
+        round2: now >= new Date("2025-04-09T09:30:00") && now <= new Date("2030-04-10T13:00:00"),
+        round3: now >= new Date("2025-03-09T09:30:00") && now <= new Date("2030-04-10T12:40:00"),
+        round4: now >= new Date("2025-03-09T09:30:00") && now <= new Date("2030-04-10T13:00:00"),
       });
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const handleRoundStart = (round) => {
+  const handleRoundStart = (round: string) => {
     setCurrentRound(round);
     setShowPopup(true);
     setErrorMessage("");
@@ -74,14 +93,14 @@ const Exam = () => {
 
     const inputId = idInput.trim().toUpperCase();
     
-    const roundToKeyMap = {
+    const roundToKeyMap: Record<string, keyof StudentData> = {
       round1: "firstIds",
       round2: "secondIds",
       round3: "thirdIds",
       round4: "fourthIds",
     };
 
-    const validIds = studentData[roundToKeyMap[currentRound]] || [];
+    const validIds = studentData[roundToKeyMap[currentRound || ""]] || [];
 
     console.log("🔍 Checking ID:", inputId);
     console.log("Valid IDs for", currentRound, ":", validIds);
@@ -121,10 +140,10 @@ const Exam = () => {
               <p>Time: 10:30 AM - {index % 2 === 0 ? "12:40 PM" : "1:00 PM"}</p>
               <button
                 className="start-btn"
-                disabled={!isRoundActive[`round${index + 1}`]}
+                disabled={!isRoundActive[`round${index + 1}` as keyof RoundStatus]}
                 onClick={() => handleRoundStart(`round${index + 1}`)}
               >
-                {isRoundActive[`round${index + 1}`] ? `Start ${year.toUpperCase()} TEST` : "Not Yet Available"}
+                {isRoundActive[`round${index + 1}` as keyof RoundStatus] ? `Start ${year.toUpperCase()} TEST` : "Not Yet Available"}
               </button>
             </div>
           ))}
@@ -136,8 +155,8 @@ const Exam = () => {
 
         {showPopup && (
           <div className="popup">
-            <h3>Enter Student ID</h3>
-            <input type="text1" placeholder="Enter ID" value={idInput} onChange={(e) => setIdInput(e.target.value)} />
+            <h3>Enter Codeathon ID</h3>
+            <input type="text" placeholder="Enter ID" value={idInput} onChange={(e) => setIdInput(e.target.value)} />
             <button onClick={verifyId}>Submit</button>
             {errorMessage && <p className="error">{errorMessage}</p>}
             <button onClick={() => setShowPopup(false)} className="cancel-btn">Cancel</button>
